@@ -1,26 +1,16 @@
 /*global describe, beforeEach, it*/
 'use strict';
 
-var path = require('path'),
-  helpers = require('yeoman-generator').test;
+const path = require('path'),
+  assert = require('yeoman-assert'),
+  helpers = require('yeoman-test');
 
 describe('bespoketheme generator', function () {
-  beforeEach(function (done) {
-    helpers.testDirectory(path.join(__dirname, 'temp'), function (err) {
-      if (err) {
-        return done(err);
-      }
-
-      this.app = helpers.createGenerator('bespoketheme:app', [
-        '../../app'
-      ]);
-
-      done();
-    }.bind(this));
-  });
+  beforeEach(() => {});
 
   it('creates expected files', function (done) {
-    var expected = [
+    this.timeout(5000);
+    let expected = [
       '.editorconfig',
       '.gitattributes',
       '.gitignore',
@@ -34,16 +24,16 @@ describe('bespoketheme generator', function () {
       'lib/bespoke-theme-foobar.js',
       'lib/theme.styl',
     ];
-
-    helpers.mockPrompt(this.app, {
-      'themeName': 'foobar',
-      'themeDescription': 'Foo bar baz',
-      'githubUser': ''
-    });
-    this.app.options['skip-install'] = true;
-    this.app.run({}, function () {
-      helpers.assertFiles(expected);
-      done();
-    });
+    helpers
+      .run(path.join(__dirname, '../app'))
+      .withPrompts({
+        'themeName': 'foobar',
+        'themeDescription': 'Foo bar baz',
+        'githubUser': ''
+      })
+      .then((dir) => {
+        assert.file(expected);
+        done();
+      })
   });
 });

@@ -1,11 +1,11 @@
 /*global describe, beforeEach, it*/
 'use strict';
 
-var assert  = require('assert');
+const assert  = require('assert');
 
 describe('bespoketheme generator', function () {
   it('can be imported without blowing up', function () {
-    var app = require('../app');
+    let app = require('../app');
     assert(app !== undefined);
   });
 });

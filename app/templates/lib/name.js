@@ -1,6 +1,7 @@
-var fs = require('fs');
-var classes = require('bespoke-classes');
-var insertCss = require('insert-css');
+var fs = require('fs'),
+  classes = require('bespoke-classes'),
+  insertCss = require('insert-css')
+;
 
 module.exports = function() {
   var css = fs.readFileSync(__dirname + '/tmp/theme.css', 'utf8');
