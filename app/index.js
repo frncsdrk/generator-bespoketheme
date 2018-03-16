@@ -64,12 +64,13 @@ const packageJson = {
     'gulp-connect': '^5.0.0',
     'gulp-csso': '^3.0.0',
     'gulp-header': '^2.0.5',
-    'gulp-jade': '^1.1.0',
+    'gulp-pug': '^3.3.0',
     'gulp-plumber': '^1.1.0',
     'gulp-rename': '^1.2.2',
+    'gulp-template': '^5.0.0',
     'gulp-stylus': '^2.6.0',
     'gulp-uglify': '^3.0.0',
-    'gulp-util': '^3.0.8',
+    'fancy-log': '^1.3.2',
     'insert-css': '^2.0.0',
     'lodash': '^4.17.5',
     'normalizecss': '^3.0.0',
@@ -175,7 +176,7 @@ module.exports = class extends Generator {
     this.fs.copy(this._sourceRoot + '/lib/theme.styl', 'lib/theme.styl');
 
     mkdirp('demo/src/scripts');
-    this.fs.copy(this._sourceRoot + '/demo/src/index.jade', 'demo/src/index.jade');
+    this.fs.copy(this._sourceRoot + '/demo/src/index.pug', 'demo/src/index.pug');
     this.fs.copy(this._sourceRoot + '/demo/src/scripts/main.js', 'demo/src/scripts/main.js');
 
     this.fs.copy(this._sourceRoot + '/gulpfile.js', 'gulpfile.js');
@@ -193,6 +194,6 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.installDependencies({bower: false});
+    this.installDependencies({ bower: false });
   }
 };

@@ -1,5 +1,5 @@
 var gulp = require('gulp'),
-  gutil = require('gulp-util'),
+  log = require('fancy-log'),
   clean = require('gulp-clean'),
   header = require('gulp-header'),
   rename = require('gulp-rename'),
@@ -7,7 +7,7 @@ var gulp = require('gulp'),
   stylus = require('gulp-stylus'),
   autoprefixer = require('gulp-autoprefixer'),
   csso = require('gulp-csso'),
-  jade = require('gulp-jade'),
+  pug = require('gulp-pug'),
   connect = require('gulp-connect'),
   plumber = require('gulp-plumber'),
   opn = require('opn'),
@@ -23,15 +23,15 @@ gulp.task('default', ['clean', 'compile']);
 gulp.task('demo', ['compile', 'watch', 'connect']);
 gulp.task('compile', ['compile:lib', 'compile:demo']);
 gulp.task('compile:lib', ['stylus', 'browserify:lib']);
-gulp.task('compile:demo', ['jade', 'browserify:demo']);
+gulp.task('compile:demo', ['pug', 'browserify:demo']);
 
 gulp.task('watch', function() {
   gulp.watch('lib/*', ['compile:lib', 'browserify:demo']);
-  gulp.watch('demo/src/*.jade', ['jade']);
+  gulp.watch('demo/src/*.pug', ['pug']);
   gulp.watch('demo/src/**/*.js', ['browserify:demo']);
 });
 
-gulp.task('clean', ['clean:browserify', 'clean:stylus', 'clean:jade']);
+gulp.task('clean', ['clean:browserify', 'clean:stylus', 'clean:pug']);
 gulp.task('clean:browserify', ['clean:browserify:lib', 'clean:browserify:demo']);
 
 gulp.task('clean:browserify:lib', function() {
@@ -49,7 +49,7 @@ gulp.task('clean:stylus', function() {
     .pipe(clean());
 });
 
-gulp.task('clean:jade', function() {
+gulp.task('clean:pug', function() {
   return gulp.src(['demo/dist/index.html'], { read: false })
     .pipe(clean());
 });
@@ -74,20 +74,20 @@ gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
     .pipe(browserify({ transform: ['brfs'], standalone: 'bespoke.themes.<%= themeNameCamelized %>' }))
     .pipe(header(template([
       '/*!',
-      ' * <%%= name %> v<%%= version %>',
+      ' * <%= name %> v<%= version %>',
       ' *',
-      ' * Copyright <%%= new Date().getFullYear() %>, <%%= author.name %>',
-      ' * This content is released under the <%%= licenses[0].type %> license',
-      ' * <%%= licenses[0].url %>',
+      ' * Copyright <%= new Date().getFullYear() %>, <%= author.name %>',
+      ' * This content is released under the <%= licenses[0].type %> license',
+      ' * <%= licenses[0].url %>',
       ' */\n\n'
     ].join('\n'), pkg)))
     .pipe(gulp.dest('dist'))
     .pipe(rename('<%= themeFullName %>.min.js'))
     .pipe(uglify())
     .pipe(header(template([
-      '/*! <%%= name %> v<%%= version %> ',
-      '© <%%= new Date().getFullYear() %> <%%= author.name %>, ',
-      '<%%= licenses[0].type %> License */\n'
+      '/*! <%= name %> v<%= version %> ',
+      '© <%= new Date().getFullYear() %> <%= author.name %>, ',
+      '<%= licenses[0].type %> License */\n'
     ].join(''), pkg)))
     .pipe(gulp.dest('dist'));
 });
@@ -101,10 +101,10 @@ gulp.task('browserify:demo', ['clean:browserify:demo'], function() {
     .pipe(connect.reload());
 });
 
-gulp.task('jade', ['clean:jade'], function() {
-  return gulp.src('demo/src/index.jade')
+gulp.task('pug', ['clean:pug'], function() {
+  return gulp.src('demo/src/index.pug')
     .pipe(isDemo ? plumber() : through())
-    .pipe(jade({ pretty: true }))
+    .pipe(pug({ pretty: true }))
     .pipe(gulp.dest('demo/dist'))
     .pipe(connect.reload());
 });
@@ -119,5 +119,5 @@ gulp.task('connect', ['compile'], function(done) {
 });
 
 gulp.task('deploy', ['compile:demo'], function(done) {
-  ghpages.publish(path.join(__dirname, 'demo/dist'), { logger: gutil.log }, done);
+  ghpages.publish(path.join(__dirname, 'demo/dist'), { logger: log }, done);
 });
