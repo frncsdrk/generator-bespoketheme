@@ -16,7 +16,8 @@ var gulp = require('gulp'),
   through = require('through'),
   path = require('path'),
   ghpages = require('gh-pages'),
-  template = require('lodash').template,
+  camelCase = require('lodash').camelCase,
+  template = require('gulp-template'),
   isDemo = process.argv.indexOf('demo') > 0;
 
 gulp.task('default', ['clean', 'compile']);
@@ -72,29 +73,37 @@ gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
   return gulp.src('lib/<%= themeFullName %>.js')
     .pipe(isDemo ? plumber() : through())
     .pipe(browserify({ transform: ['brfs'], standalone: 'bespoke.themes.<%= themeNameCamelized %>' }))
-    .pipe(header(template([
+    .pipe(header([
       '/*!',
-      ' * <%= name %> v<%= version %>',
+      ' * <%= pkg.name %> v<%= pkg.version %>',
       ' *',
-      ' * Copyright <%= new Date().getFullYear() %>, <%= author.name %>',
-      ' * This content is released under the <%= licenses[0].type %> license',
-      ' * <%= licenses[0].url %>',
+      ' * Copyright <%= new Date().getFullYear() %>, <%= pkg.author.name %>',
+      ' * This content is released under the <%= pkg.licenses[0].type %> license',
+      ' * <%= pkg.licenses[0].url %>',
       ' */\n\n'
-    ].join('\n'), pkg)))
+    ].join('\n'), { pkg: pkg }))
     .pipe(gulp.dest('dist'))
-    .pipe(rename('<%= themeFullName %>.min.js'))
+    .pipe(rename({
+      basename: pkg.name,
+      suffix: '.min', // '<%= themeFullName %>.min.js'
+      extname: '.js'
+    }))
     .pipe(uglify())
-    .pipe(header(template([
-      '/*! <%= name %> v<%= version %> ',
-      '© <%= new Date().getFullYear() %> <%= author.name %>, ',
-      '<%= licenses[0].type %> License */\n'
-    ].join(''), pkg)))
+    .pipe(header([
+      '/*! <%= pkg.name %> v<%= pkg.version %> ',
+      '© <%= new Date().getFullYear() %> <%= pkg.author.name %>, ',
+      '<%= pkg.licenses[0].type %> License */\n'
+    ].join(''), { pkg: pkg }))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('browserify:demo', ['clean:browserify:demo'], function() {
   return gulp.src('demo/src/scripts/main.js')
     .pipe(isDemo ? plumber() : through())
+    .pipe(template({
+      themeFullName: pkg.name,
+      themeNameCamelized: camelCase(pkg.name)
+    }))
     .pipe(browserify({ transform: ['brfs'] }))
     .pipe(rename('build.js'))
     .pipe(gulp.dest('demo/dist/build'))
@@ -104,6 +113,12 @@ gulp.task('browserify:demo', ['clean:browserify:demo'], function() {
 gulp.task('pug', ['clean:pug'], function() {
   return gulp.src('demo/src/index.pug')
     .pipe(isDemo ? plumber() : through())
+    .pipe(template({
+      themeFullName: pkg.name,
+      themeDescription: pkg.description,
+      realName: pkg.author.name,
+      githubUser: pkg.repository.url.split('/')[3]
+    }))
     .pipe(pug({ pretty: true }))
     .pipe(gulp.dest('demo/dist'))
     .pipe(connect.reload());

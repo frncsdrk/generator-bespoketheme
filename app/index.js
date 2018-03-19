@@ -37,72 +37,16 @@ let welcome = [
   ""
 ].join('\n');
 
-const packageJson = {
-  'scripts': {
-    'test': 'gulp'
-  },
-  'peerDependencies': {
-    'bespoke': '>=1.0.0'
-  },
-  'devDependencies': {
-    'bespoke': '^1.1.0',
-    'bespoke-backdrop': '^1.0.0',
-    'bespoke-bullets': '^1.1.0',
-    'bespoke-classes': '^1.0.0',
-    'bespoke-keys': '^1.1.0',
-    'bespoke-progress': '^1.0.0',
-    'bespoke-scale': '^1.0.1',
-    'bespoke-touch': '^1.0.0',
-    'brfs': '^1.5.0',
-    'browserify': '^16.1.1',
-    'function-bind': '^1.1.1',
-    'gh-pages': '^1.0.0',
-    'gulp': '^3.9.1',
-    'gulp-autoprefixer': '^3.1.1',
-    'gulp-browserify': '^0.5.1',
-    'gulp-clean': '^0.4.0',
-    'gulp-connect': '^5.0.0',
-    'gulp-csso': '^3.0.0',
-    'gulp-header': '^2.0.5',
-    'gulp-pug': '^3.3.0',
-    'gulp-plumber': '^1.1.0',
-    'gulp-rename': '^1.2.2',
-    'gulp-template': '^5.0.0',
-    'gulp-stylus': '^2.6.0',
-    'gulp-uglify': '^3.0.0',
-    'fancy-log': '^1.3.2',
-    'insert-css': '^2.0.0',
-    'lodash': '^4.17.5',
-    'normalizecss': '^3.0.0',
-    'opn': '^5.2.0',
-    'through': '^2.3.8'
-  },
-  'engines': {
-    'node': '>=4.0.0'
-  },
-  'keywords': [
-    'bespoke-plugin',
-    'bespoke-theme'
-  ]
-};
-
-const bowerJson = {
-  'name': this.themeFullName,
-  'version': '1.0.0',
-  "main": "./dist/" + this.themeFullName + ".js",
-  "ignore": [
-    "**/.*"
-  ],
-  'dependencies': {
-    'bespoke.js': '>=1.1.0'
-  }
-};
-
 const questions = [
   {
     name: 'githubUser',
     message: 'What is your GitHub username?',
     default: 'someuser'
+  },
+  {
+    name: 'realName',
+    message: 'Should we use your real name as package author? If so provide it here.',
+    default: 'your github username'
   },
   {
     name: 'themeName',
@@ -135,6 +79,12 @@ module.exports = class extends Generator {
 
     return this.prompt(prompts)
       .then((answers) => {
+        this.githubUser = answers.githubUser;
+        this.realName = 'your github username' === answers.realName
+          ? this.githubUser
+          : answers.realName
+        ;
+
         this.themeName = _.kebabCase(answers.themeName).replace(/^(bespoke-)?theme-/, '').toLowerCase();
         this.themeNameCamelized = _.camelCase(this.themeName);
         this.themeFullName = 'bespoke-theme-' + this.themeName;
@@ -142,32 +92,91 @@ module.exports = class extends Generator {
         this.shortName = _.kebabCase(answers.title);
         this.themeDescription = answers.themeDescription;
         this.license = answers.license;
+
+        this.githubUrl = 'https://github.com/' + this.githubUser + '/' + this.themeFullName;
       }
     );
   }
 
   default() {
-    packageJson.name = this.themeFullName;
-    packageJson.version = '1.0.0';
-    packageJson.description = this.themeDescription;
-    packageJson.homepage = this.githubUrl + '/' + this.themeFullName;
-    packageJson.bugs = this.githubUrl + '/' + this.themeFullName + '/issues';
-    packageJson.author = {
-      'name': this.realName,
-      'url': this.githubUrl
+    this.packageJson = {
+      name: this.themeFullName,
+      version: '1.0.0',
+      description: this.themeDescription,
+      homepage: this.githubUrl + '/' + this.themeFullName,
+      bugs: this.githubUrl + '/' + this.themeFullName + '/issues',
+      author: {
+        'name': this.realName,
+        'url': 'https://github.com/' + this.githubUser + '/' + this.themeFullName
+      },
+      main: './dist/' + this.themeFullName + '.js',
+      repository: {
+        'type': 'git',
+        'url': 'git://github.com/' + this.githubUser + '/' + this.themeFullName + '.git'
+      },
+      licenses: [
+        {
+          'type': this.license
+        }
+      ],
+      scripts: {
+        'test': 'gulp'
+      },
+      peerDependencies: {
+        'bespoke': '>=1.1.0'
+      },
+      devDependencies: {
+        'bespoke': '^1.1.0',
+        'bespoke-backdrop': '^1.0.0',
+        'bespoke-bullets': '^1.1.0',
+        'bespoke-classes': '^1.0.0',
+        'bespoke-keys': '^1.1.0',
+        'bespoke-progress': '^1.0.0',
+        'bespoke-scale': '^1.0.1',
+        'bespoke-touch': '^1.0.0',
+        'brfs': '^1.5.0',
+        'browserify': '^16.1.1',
+        'function-bind': '^1.1.1',
+        'gh-pages': '^1.0.0',
+        'gulp': '^3.9.1',
+        'gulp-autoprefixer': '^3.1.1',
+        'gulp-browserify': '^0.5.1',
+        'gulp-clean': '^0.4.0',
+        'gulp-connect': '^5.0.0',
+        'gulp-csso': '^3.0.0',
+        'gulp-header': '^2.0.5',
+        'gulp-pug': '^3.3.0',
+        'gulp-plumber': '^1.1.0',
+        'gulp-rename': '^1.2.2',
+        'gulp-template': '^5.0.0',
+        'gulp-stylus': '^2.6.0',
+        'gulp-uglify': '^3.0.0',
+        'fancy-log': '^1.3.2',
+        'insert-css': '^2.0.0',
+        'lodash': '^4.17.5',
+        'normalizecss': '^3.0.0',
+        'opn': '^5.2.0',
+        'through': '^2.3.8'
+      },
+      engines: {
+        'node': '>=4.0.0'
+      },
+      keywords: [
+        'bespoke-plugin',
+        'bespoke-theme'
+      ]
     };
-    packageJson.main = './dist/' + this.themeFullName + '.js';
-    packageJson.repository = {
-      'type': 'git',
-      'url': 'git://github.com/' + this.githubUser + '/' + this.themeFullName + '.git'
-    };
-    packageJson.licenses = [
-      {
-        'type': this.license
+    this.bowerJson = {
+      'name': this.themeFullName,
+      'version': '1.0.0',
+      "main": "./dist/" + this.themeFullName + ".js",
+      "ignore": [
+        "**/.*"
+      ],
+      'dependencies': {
+        'bespoke.js': '>=1.1.0'
       }
-    ];
-    bowerJson.name = this.themeFullName;
-    bowerJson.main = "./dist/" + this.themeFullName + ".js";
+    };
   }
 
   writing() {
@@ -189,8 +198,8 @@ module.exports = class extends Generator {
     this.fs.copy(this._sourceRoot + '/_gitattributes', '.gitattributes');
     this.fs.copy(this._sourceRoot + '/_gitignore', '.gitignore');
     this.fs.copy(this._sourceRoot + '/_travis.yml', '.travis.yml');
-    this.fs.write('package.json', JSON.stringify(packageJson, null, 2));
-    this.fs.write('bower.json', JSON.stringify(bowerJson, null, 2));
+    this.fs.write('package.json', JSON.stringify(this.packageJson, null, 2));
+    this.fs.write('bower.json', JSON.stringify(this.bowerJson, null, 2));
   }
 
   install() {
