@@ -24,7 +24,6 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@octokit/rest": "~15.2.2",
     "chalk": "~2.3.2",
     "lodash": "^4.17.5",
     "mkdirp": "^0.5.1",

@@ -85,7 +85,7 @@ gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
     .pipe(gulp.dest('dist'))
     .pipe(rename({
       basename: pkg.name,
-      suffix: '.min', // '<%= themeFullName %>.min.js'
+      suffix: '.min',
       extname: '.js'
     }))
     .pipe(uglify())

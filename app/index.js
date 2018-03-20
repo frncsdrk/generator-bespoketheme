@@ -6,18 +6,8 @@ const fs = require('fs'),
   Generator = require('yeoman-generator'),
   chalk = require('chalk'),
   _ = require('lodash'),
-  mkdirp = require('mkdirp'),
-  GitHubApi = require('@octokit/rest');
-
-const github = new GitHubApi({
-    version: '3.0.0'
-  }),
-  githubUserInfo = function (user, callback) {
-    github.user.getFrom({ user: user }, function (err, res) {
-      if (err) { throw err; }
-      callback(JSON.parse(JSON.stringify(res)));
-    });
-  };
+  mkdirp = require('mkdirp')
+;
 
 // welcome message
 let welcome = [
@@ -67,8 +57,6 @@ const questions = [
 
 module.exports = class extends Generator {
   initializing() {
-    // generators.Base.apply(this, arguments);
-    this.props = {};
     this.log(welcome);
   }
 
@@ -89,7 +77,6 @@ module.exports = class extends Generator {
         this.themeNameCamelized = _.camelCase(this.themeName);
         this.themeFullName = 'bespoke-theme-' + this.themeName;
 
-        this.shortName = _.kebabCase(answers.title);
         this.themeDescription = answers.themeDescription;
         this.license = answers.license;
 
@@ -180,24 +167,26 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    const SRC_ROOT = this.sourceRoot();
+
     mkdirp('lib');
-    this.fs.copy(this._sourceRoot + '/lib/name.js', this.destinationPath('lib/' + this.themeFullName + '.js'));
-    this.fs.copy(this._sourceRoot + '/lib/theme.styl', 'lib/theme.styl');
+    this.fs.copy(SRC_ROOT + '/lib/name.js', 'lib/' + this.themeFullName + '.js');
+    this.fs.copy(SRC_ROOT + '/lib/theme.styl', 'lib/theme.styl');
 
     mkdirp('demo/src/scripts');
-    this.fs.copy(this._sourceRoot + '/demo/src/index.pug', 'demo/src/index.pug');
-    this.fs.copy(this._sourceRoot + '/demo/src/scripts/main.js', 'demo/src/scripts/main.js');
+    this.fs.copy(SRC_ROOT + '/demo/src/index.pug', 'demo/src/index.pug');
+    this.fs.copy(SRC_ROOT + '/demo/src/scripts/main.js', 'demo/src/scripts/main.js');
 
-    this.fs.copy(this._sourceRoot + '/gulpfile.js', 'gulpfile.js');
+    this.fs.copy(SRC_ROOT + '/gulpfile.js', 'gulpfile.js');
 
-    this.fs.copy(this._sourceRoot + '/CONTRIBUTING.md', 'CONTRIBUTING.md');
-    this.fs.copy(this._sourceRoot + '/LICENSE', 'LICENSE');
-    this.fs.copy(this._sourceRoot + '/README.md', 'README.md');
+    this.fs.copy(SRC_ROOT + '/CONTRIBUTING.md', 'CONTRIBUTING.md');
+    this.fs.copy(SRC_ROOT + '/LICENSE', 'LICENSE');
+    this.fs.copy(SRC_ROOT + '/README.md', 'README.md');
 
-    this.fs.copy(this._sourceRoot + '/_editorconfig', '.editorconfig');
-    this.fs.copy(this._sourceRoot + '/_gitattributes', '.gitattributes');
-    this.fs.copy(this._sourceRoot + '/_gitignore', '.gitignore');
-    this.fs.copy(this._sourceRoot + '/_travis.yml', '.travis.yml');
+    this.fs.copy(SRC_ROOT + '/_editorconfig', '.editorconfig');
+    this.fs.copy(SRC_ROOT + '/_gitattributes', '.gitattributes');
+    this.fs.copy(SRC_ROOT + '/_gitignore', '.gitignore');
+    this.fs.copy(SRC_ROOT + '/_travis.yml', '.travis.yml');
     this.fs.write('package.json', JSON.stringify(this.packageJson, null, 2));
     this.fs.write('bower.json', JSON.stringify(this.bowerJson, null, 2));
   }
