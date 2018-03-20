@@ -1,6 +1,6 @@
 {
   "name": "generator-bespoketheme",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Yeoman generator for Bespoke.js themes",
   "keywords": [
     "yeoman-generator"
@@ -13,8 +13,8 @@
   },
   "main": "app/index.js",
   "engines": {
-    "node": ">=0.8.0",
-    "npm": ">=1.2.10"
+    "node": ">=8.10.0",
+    "npm": ">=5.6.0"
   },
   "repository": {
     "type": "git",
